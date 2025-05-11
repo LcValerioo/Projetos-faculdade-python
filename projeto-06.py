@@ -60,9 +60,7 @@ except IsADirectoryError as erro:
     print(f"Remove serve apenas para arquivo.")
     print(f"Descrição: {erro}")
 '''
-
-
-import os
+'''
 try:
     os.remove('arquivo.txt')
 except FileNotFoundError:
@@ -75,3 +73,57 @@ except Exception as e:
     print(f"Erro inesperado: {e}")
 
 print("Termino do programa")
+'''
+
+#Manipulação de diretórios 
+'''
+#Criando diretório
+try:
+    os.mkdir(f"meu_diretorio")
+    print(f"Diretório criado!")
+except PermissionError as erro:
+    print(f"Sem permissão para criar diretório")
+    print(f"Descrição: {erro}")
+except FileExistsError as erro:
+    print(f"Diretório já existe")
+    print(f"Descrição: {erro}")
+
+'''
+'''
+#Excluindo Diretório
+try:
+    os.rmdir("meu_diretorio")
+    print(f"Diretório Removido.")
+except PermissionError as erro:
+    print(f"Sem permissão para remover o diretório.")
+    print(f"Descrição: {erro}")
+except FileNotFoundError as erro:
+    print(f"Diretório Inexistente.")
+    print(f"Descrição: {erro}")
+except OSError as erro:
+    print("Outro erro.")
+    print(f"O diretório está vazio ?")
+    print(f"Descrição: {erro}")
+'''
+
+#Listando conteúdo de diretórios
+
+try:
+    entradas = os.scandir("meu_diretorio")
+
+    for obj in entradas:
+        print(obj)
+        print(f"Nome: {obj.name}")
+        print(f"Caminho: {obj.path}")
+        print(f"É Diretório: {obj.is_dir()}")
+        print(f"É arquivo: {obj.is_file()}")
+        if obj.is_file():
+            print("Tamanho:", obj.stat().st_size, "B")
+        print("=====================================")
+
+except FileNotFoundError:
+    print(f"O Caminho não existe.")
+except NotADirectoryError:
+    print(f"O caminho não é de um diretório.")
+
+print("Termino do Programa")
