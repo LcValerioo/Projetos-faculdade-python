@@ -184,3 +184,160 @@ finally:
     cursor.close()
     conexao.close()
 """
+
+#Seleção de registros de uma tabela
+"""
+import sqlite3 as conector
+
+try:
+    #Abertura das conexões 
+    conexao = conector.connect("banco_alternativo.db")
+    conexao.execute("PRAGMA foreign_keys = on")
+    cursor = conexao.cursor()
+
+    #Definição dos registros
+    cursor.execute('''SELECT nome, oculos FROM Pessoa''')
+
+    #Recuperação de dados
+    registros = cursor.fetchall()
+    print("Tipo retornado pelo fetchall: ", type(registros))
+
+    for registro in registros:
+        print("Tipo:", type(registro), "- Conteúdo: ", registro)
+
+except conector.DatabaseError as err:
+    print(f"Deu ruim fiote no BD {err}")
+
+finally:
+    #Fechando as conexões
+    cursor.close()
+    conexao.close()
+"""
+
+#Vamos criar agora uma consulta para retornar às pessoas que usam óculos
+"""
+import sqlite3 as conector
+from modelo import Pessoa
+
+try:
+    #Abertura das conexões
+    conexao = conector.connect("banco_alternativo.db", detect_types=conector.PARSE_DECLTYPES)
+    conexao.execute("PRAGMA foreign_keys = on")
+    cursor = conexao.cursor()
+    '''
+    #Funções conversoras
+    def conv_bool(dado):
+        return True if dado == 1 else False
+    
+    #Registro de conversores
+    conector.register_converter("BOOLEAN", conv_bool)
+    '''
+
+    #Definição dos comandos
+    cursor.execute('''SELECT * FROM Pessoa WHERE oculos=:usa_oculos''', {"usa_oculos": True})
+
+    #Recuperação dos registros
+    registros = cursor.fetchall()
+    for registro in registros:
+        pessoa = Pessoa(*registro)
+        print("CPF:", type(pessoa.cpf), pessoa.cpf)
+        print("Nome:", type(pessoa.nome), pessoa.nome)
+        print("Nascimento:", type(pessoa.data_nascimento), pessoa.data_nascimento)
+        print("Oculos:", type(pessoa.usa_oculos), pessoa.usa_oculos)
+        print("\n")
+
+
+except conector.DatabaseError as err:
+    print(f"Deu Ruim ai no Seu BD {err}")
+
+finally:
+    #Fechando as conexões
+    cursor.close()
+    conexao.close()
+"""
+
+#Seleção de registro utilizando o JOIN
+"""
+import sqlite3 as conector
+from modelo import Veiculo, Marca
+
+try:
+    #Abertura das conexões
+    conexao = conector.connect("banco_alternativo.db")
+    conexao.execute("PRAGMA foreign_keys = on")
+    cursor = conexao.cursor()
+
+    #Definindo os comandos
+    cursor.execute('''SELECT Veiculo.placa, Veiculo.ano, Veiculo.cor, Veiculo.motor, Veiculo.proprietario, Marca.nome 
+                    FROM Veiculo 
+                    JOIN Marca ON Marca.id = Veiculo.marca''')
+    
+    print("Este é um método para exibir os dados de interesse: \n")
+
+    #Recuperação dos registros
+    reg_veiculos = cursor.fetchall()
+    for reg_veiculo in reg_veiculos:
+        veiculo = Veiculo(*reg_veiculo)
+        print(f"Placa: {veiculo.placa}, Marca: {veiculo.marca}")
+
+    print("\nEsta é outra maneira de aprensetar os dados de interesse: \n")
+
+    #Definição de comandos
+    cursor.execute('''SELECT * FROM Veiculo JOIN Marca ON Marca.id = Veiculo.marca''')
+
+    #Recuperação dos registros
+    registros = cursor.fetchall()
+    for registro in registros:
+        print(registro)
+        marca = Marca(*registro[6:])
+        veiculo = Veiculo(*registro[:5], marca)
+        print(f"Placa: {veiculo.placa}, Marca: {veiculo.marca.nome}")
+    
+
+except conector.DatabaseError as err:
+    print(f"Deu problema no seu BD chefe {err}")
+
+finally:
+    #Fechando as conexões
+    cursor.close()
+    conexao.close()
+"""
+
+#Seleção de registros relacionados
+"""
+import sqlite3 as conector
+from modelo import Pessoa
+from script19_4 import recuperar_veiculos
+
+try:
+
+    #Abertura das conexões
+    conexao = conector.connect("banco_alternativo.db")
+    conexao.execute("PRAGMA foreign_keys = on")
+    cursor = conexao.cursor()
+
+    #Definição de comandos
+    cursor.execute('''SELECT * FROM Pessoa''')
+
+    #Recuperação dos registros
+    pessoas = []
+    reg_pessoas = cursor.fetchall()
+    for reg_pessoa in reg_pessoas:
+        pessoa = Pessoa(*reg_pessoa)
+        pessoa.veiculos = recuperar_veiculos(conexao, pessoa.cpf)
+        pessoas.append(pessoa)
+
+    for pessoa in pessoas:
+        print(pessoa.nome)
+        for veiculo in pessoa.veiculos:
+            print(veiculo.placa, veiculo.marca.nome)
+            print("\t")
+
+except conector.DatabaseError as err:
+    print(f"Ops ! Parece que deu errado o BD {err}")
+
+finally:
+    #Fechando as conexões
+    cursor.close()
+    conexao.close()
+"""
