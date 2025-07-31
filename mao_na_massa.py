@@ -226,6 +226,76 @@ def exibir_pedidos(conexao):
     for pedido in pedidos:
         print(pedido)
 
+#Implementando a atualização de dados
+def atualizar_dado(conexao):
+    print("\n-- Atualizar --")
+    print("1. Livro")
+    print("2. Cliente")
+    print("3. Pedido")
+    tipo = input("Escolha o tipo para atualizar: ")
+
+    cursor = conexao.cursor()
+
+    if tipo == '1':
+        id_livro = int(input("ID do livro a atualizar: "))
+        novo_titulo = input("Novo título: ")
+        novo_autor = input("Novo autor: ")
+        novo_preco = float(input("Novo preço: "))
+        cursor.execute('UPDATE Livros SET titulo = ?, autor = ?, preco = ? WHERE id = ?',
+                       (novo_titulo, novo_autor, novo_preco, id_livro))
+
+    elif tipo == '2':
+        id_cliente = int(input("ID do cliente a atualizar: "))
+        novo_nome = input("Novo nome: ")
+        novo_email = input("Novo e-mail: ")
+        cursor.execute('UPDATE Clientes SET nome = ?, email = ? WHERE id = ?',
+                       (novo_nome, novo_email, id_cliente))
+
+    elif tipo == '3':
+        id_pedido = int(input("ID do pedido a atualizar: "))
+        novo_cliente = int(input("Novo ID do cliente: "))
+        novo_livro = int(input("Novo ID do livro: "))
+        nova_qtd = int(input("Nova quantidade: "))
+        nova_data = input("Nova data (YYYY-MM-DD): ")
+        cursor.execute('''UPDATE Pedidos SET cliente_id = ?, livro_id = ?, quantidade = ?, data_pedido = ? 
+                          WHERE id = ?''',
+                       (novo_cliente, novo_livro, nova_qtd, nova_data, id_pedido))
+    
+    else:
+        print("Opção inválida de tipo.")
+        return
+
+    conexao.commit()
+    cursor.close()
+    print("Atualização concluída com sucesso!")
+
+#Implementando a exclusão de dados
+def excluir_dado(conexao):
+    print("\n-- Excluir --")
+    print("1. Livro")
+    print("2. Cliente")
+    print("3. Pedido")
+    tipo = input("Escolha o tipo para excluir: ")
+
+    cursor = conexao.cursor()
+
+    if tipo == '1':
+        id_livro = int(input("ID do livro a excluir: "))
+        cursor.execute('DELETE FROM Livros WHERE id = ?', (id_livro,))
+    elif tipo == '2':
+        id_cliente = int(input("ID do cliente a excluir: "))
+        cursor.execute('DELETE FROM Clientes WHERE id = ?', (id_cliente,))
+    elif tipo == '3':
+        id_pedido = int(input("ID do pedido a excluir: "))
+        cursor.execute('DELETE FROM Pedidos WHERE id = ?', (id_pedido,))
+    else:
+        print("Opção inválida de tipo.")
+        return
+
+    conexao.commit()
+    cursor.close()
+    print("Exclusão realizada com sucesso!")
+
 if __name__ == '__main__':
     conexao = conectar_banco("livraria.db")
     
@@ -235,7 +305,9 @@ if __name__ == '__main__':
         print("2. Inserir Cliente")
         print("3. Inserir Pedido")
         print("4. Exibir Pedidos")
-        print("5. Sair")
+        print("5. Atualizar Dados")
+        print("6. Excluir Dados")
+        print("7. Sair")
 
         escolha = input("Escolha uma opção: ")
 
@@ -248,9 +320,16 @@ if __name__ == '__main__':
         elif escolha == '4':
             exibir_pedidos(conexao)
         elif escolha == '5':
+            atualizar_dado(conexao)
+        elif escolha == '6':
+            excluir_dado(conexao)
+        elif escolha == '7':
+            print("Encerrando...")
             break
         else:
             print("Opção inválida. Tente novamente.")
+
+    conexao.close()
 
     print("---FIM DO PROGRAMA---")
 
