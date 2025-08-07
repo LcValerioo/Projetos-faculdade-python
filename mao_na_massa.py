@@ -160,7 +160,7 @@ if __name__ == '__main__':
 """
 
 #Aqui deixamos o SGBD interativo
-"""
+
 import sqlite3 as conector
 from modelo import Livro, Cliente, Pedido
 
@@ -334,7 +334,7 @@ if __name__ == '__main__':
     print("---FIM DO PROGRAMA---")
 
     conexao.close()
-"""
+
 """
 import psycopg2
 from psycopg2 import Error
