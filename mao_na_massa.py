@@ -160,7 +160,7 @@ if __name__ == '__main__':
 """
 
 #Aqui deixamos o SGBD interativo
-
+"""
 import sqlite3 as conector
 from modelo import Livro, Cliente, Pedido
 
@@ -169,6 +169,33 @@ def conectar_banco(nome_banco):
     conexao = conector.connect(nome_banco)
     conexao.execute("PRAGMA foreign_keys = on")
     return conexao
+
+#Implementando as tabelas
+def criar_tabelas(conexao):
+    cursor = conexao.cursor()
+
+    cursor.execute('''CREATE TABLE IF NOT EXISTS Livros (
+                   id INTEGER PRIMARY KEY AUTOINCREMENT,
+                   titulo TEXT NOT NULL,
+                   autor TEXT NOT NULL,
+                   preco REAL NOT NULL)''')
+    
+    cursor.execute('''CREATE TABLE IF NOT EXISTS Clientes (
+                   id INTEGER PRIMARY KEY AUTOINCREMENT,
+                   nome TEXT NOT NULL,
+                   email TEXT NOT NULL)''')
+    
+    cursor.execute('''CREATE TABLE IF NOT EXISTS Pedidos (
+                   id INTEGER PRIMARY KEY AUTOINCREMENT,
+                   cliente_id INTEGER NOT NULL,
+                   livro_id INTEGER NOT NULL,
+                   quantidade INTEGER NOT NULL,
+                   data_pedido TEXT NOT NULL,
+                   FOREIGN KEY (cliente_id) REFERENCES Clientes(id),
+                   FOREIGN KEY (livro_id) REFERENCES Livros(id))''')
+    
+    conexao.commit()
+    cursor.close()
 
 #Implementando livro pegando dados do teclado
 def inserir_livro(conexao):
@@ -298,6 +325,7 @@ def excluir_dado(conexao):
 
 if __name__ == '__main__':
     conexao = conectar_banco("livraria.db")
+    criar_tabelas(conexao)
     
     while True:
         print("\n=== MENU ===")
@@ -334,7 +362,7 @@ if __name__ == '__main__':
     print("---FIM DO PROGRAMA---")
 
     conexao.close()
-
+"""
 """
 import psycopg2
 from psycopg2 import Error
